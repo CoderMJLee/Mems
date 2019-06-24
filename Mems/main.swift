@@ -1,13 +1,13 @@
-# Mems
->  Utils for viewing memory in Swift.
->
-> 用来窥探Swift内存的小工具
+//
+//  main.swift
+//  Mems
+//
+//  Created by MJ Lee on 2019/6/22.
+//  Copyright © 2019 MJ Lee. All rights reserved.
+//
 
+import Foundation
 
-
-## 用法
-
-```swift
 func show<T>(val: inout T) {
     print("-------------- \(type(of: val)) --------------")
     print("变量的地址:", Mems.ptr(ofVal: &val))
@@ -69,11 +69,3 @@ show(ref: p)
 var arr = [1, 2, 3, 4]
 show(val: &arr)
 show(ref: arr)
-```
-
-- 打印结果如下
-
-```shell
-
-```
-
