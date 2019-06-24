@@ -61,11 +61,11 @@ show(val: &int64)
 
 ```swift
 enum TestEnum {
-  case test1(Int, Int, Int)
-  case test2(Int, Int)
-  case test3(Int)
-  case test4(Bool)
-  case test5
+    case test1(Int, Int, Int)
+    case test2(Int, Int)
+    case test3(Int)
+    case test4(Bool)
+    case test5
 }
 
 var e = TestEnum.test1(1, 2, 3)
@@ -108,10 +108,10 @@ show(val: &e)
 
 ```swift
 struct Date {
-  var year = 10
-  var test = true
-  var month = 20
-  var day = 30
+    var year = 10
+    var test = true
+    var month = 20
+    var day = 30
 }
 
 var s = Date()
@@ -126,9 +126,9 @@ show(val: &s)
 
 ```swift
 class Point  {
-  var x = 11
-  var test = true
-  var y = 22
+    var x = 11
+    var test = true
+    var y = 22
 }
 
 var p = Point()
@@ -141,7 +141,7 @@ show(val: &p)
 show(ref: p)
 // -------------- Point --------------
 // 对象的地址: 0x0000000101023680
-// 对象的内存: 0x00000001000072d8 0x0000000200000002 0x000000000000000b 0x3030303030303001 0x0000000000000016 0x0000000000000000
+// 对象的内存: 0x00000001000072d8 0x0000000200000002 0x000000000000000b 0x0000000000000001 0x0000000000000016 0x3030303030303030
 // 对象的大小: 48
 ```
 

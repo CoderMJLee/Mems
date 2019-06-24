@@ -36,11 +36,6 @@ func showInt() {
     show(val: &int32)
     
     var int64: Int64 = 10
-    print(Mems.memStr(ofVal: &int64, alignment: .one))
-    print(Mems.memStr(ofVal: &int64, alignment: .two))
-    print(Mems.memStr(ofVal: &int64, alignment: .four))
-    print(Mems.memStr(ofVal: &int64, alignment: .eight))
-    
     show(val: &int64)
 }
 
