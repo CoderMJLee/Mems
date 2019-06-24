@@ -24,48 +24,89 @@ func show<T>(ref: T) {
     print("")
 }
 
-// 整型数据
-var int8: Int8 = 10
-show(val: &int8)
-
-var int16: Int16 = 10
-show(val: &int16)
-
-var int32: Int32 = 10
-show(val: &int32)
-
-var int64: Int64 = 10
-show(val: &int64)
-
-// 枚举类型
-enum TestEnum {
-    case test1(Int)
-    case test2(Bool)
+/// 整型
+func showInt() {
+    var int8: Int8 = 10
+    show(val: &int8)
+    
+    var int16: Int16 = 10
+    show(val: &int16)
+    
+    var int32: Int32 = 10
+    show(val: &int32)
+    
+    var int64: Int64 = 10
+    print(Mems.memStr(ofVal: &int64, alignment: .one))
+    print(Mems.memStr(ofVal: &int64, alignment: .two))
+    print(Mems.memStr(ofVal: &int64, alignment: .four))
+    print(Mems.memStr(ofVal: &int64, alignment: .eight))
+    
+    show(val: &int64)
 }
-var e = TestEnum.test1(10)
-show(val: &e)
 
-// 结构体
-struct Date {
-    var year = 10
-    var test = true
-    var month = 20
-    var day = 30
+/// 枚举
+func showEnum() {
+    enum TestEnum {
+        case test1(Int, Int, Int)
+        case test2(Int, Int)
+        case test3(Int)
+        case test4(Bool)
+        case test5
+    }
+    var e = TestEnum.test1(1, 2, 3)
+    show(val: &e)
+    e = .test2(4, 5)
+    show(val: &e)
+    e = .test3(6)
+    show(val: &e)
+    e = .test4(true)
+    show(val: &e)
+    e = .test5
+    show(val: &e)
 }
-var s = Date()
-show(val: &s)
 
-// 对象
-class Point  {
-    var x = 11
-    var test = true
-    var y = 22
+/// 结构体
+func showStruct() {
+    struct Date {
+        var year = 10
+        var test = true
+        var month = 20
+        var day = 30
+    }
+    var s = Date()
+    show(val: &s)
 }
-var p = Point()
-show(val: &p)
-show(ref: p)
 
-// 数组
-var arr = [1, 2, 3, 4]
-show(val: &arr)
-show(ref: arr)
+// 类
+func showClass() {
+    class Point  {
+        var x = 11
+        var test = true
+        var y = 22
+    }
+    var p = Point()
+    show(val: &p)
+    show(ref: p)
+}
+
+/// 数组
+func showArray() {
+    var arr = [1, 2, 3, 4]
+    show(val: &arr)
+    show(ref: arr)
+}
+
+func showByteFormat() {
+    var int64: Int64 = 10
+    print("1个字节为1组 :", Mems.memStr(ofVal: &int64, alignment: .one))
+    print("2个字节为1组 :", Mems.memStr(ofVal: &int64, alignment: .two))
+    print("4个字节为1组 :", Mems.memStr(ofVal: &int64, alignment: .four))
+    print("8个字节为1组 :", Mems.memStr(ofVal: &int64, alignment: .eight))
+}
+
+showInt()
+showEnum()
+showStruct()
+showClass()
+showArray()
+showByteFormat()
