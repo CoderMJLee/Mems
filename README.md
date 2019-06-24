@@ -25,7 +25,7 @@ func show<T>(ref: T) {
 }
 ```
 
-- 整形
+### 整型
 
 ```swift
 var int8: Int8 = 10
@@ -57,7 +57,7 @@ show(val: &int64)
 // 变量的大小: 8
 ```
 
-- 枚举
+### 枚举
 
 ```swift
 enum TestEnum {
@@ -104,7 +104,7 @@ show(val: &e)
 // 变量的大小: 32
 ```
 
-- 结构体
+### 结构体
 
 ```swift
 struct Date {
@@ -122,7 +122,7 @@ show(val: &s)
 // 变量的大小: 32
 ```
 
-- 类
+### 类
 
 ```swift
 class Point  {
@@ -145,7 +145,7 @@ show(ref: p)
 // 对象的大小: 48
 ```
 
-- 数组
+### 数组
 
 ```swift
 var arr = [1, 2, 3, 4]
@@ -162,7 +162,7 @@ show(ref: arr)
 // 对象的大小: 64
 ```
 
-- 设置字节显示格式
+### 设置字节显示格式
 
 ```swift
 var int64: Int64 = 10
