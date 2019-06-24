@@ -12,11 +12,17 @@ public enum MemAlign : Int {
     case one = 1, two = 2, four = 4, eight = 8
 }
 
+private let _EMPTY_PTR = UnsafeRawPointer(bitPattern: 0x1)!
+
 /// 辅助查看内存的小工具类
 public struct Mems<T> {
     private static func _memStr(_ ptr: UnsafeRawPointer,
                                 _ size: Int,
                                 _ aligment: Int) ->String {
+        if ptr == _EMPTY_PTR {
+            return ""
+        }
+        
         var rawPtr = ptr
         var string = ""
         let fmt = "0x%0\(aligment << 1)lx"
@@ -26,7 +32,7 @@ public struct Mems<T> {
                 string.append(" ")
                 rawPtr = rawPtr.advanced(by: aligment)
             }
-            let value: Any
+            let value: CVarArg
             switch aligment {
             case MemAlign.eight.rawValue:
                 value = rawPtr.assumingMemoryBound(to: UInt64.self).pointee
@@ -37,7 +43,7 @@ public struct Mems<T> {
             default:
                 value = rawPtr.assumingMemoryBound(to: UInt8.self).pointee
             }
-            string.append(String(format: fmt, value as! CVarArg))
+            string.append(String(format: fmt, value))
         }
         return string
     }
@@ -45,6 +51,9 @@ public struct Mems<T> {
     public static func _memBytes(_ ptr: UnsafeRawPointer,
                                  _ size: Int) -> [UInt8] {
         var arr: [UInt8] = []
+        if ptr == _EMPTY_PTR {
+            return arr
+        }
         for i in 0..<size {
             arr.append(ptr.advanced(by: i).assumingMemoryBound(to: UInt8.self).pointee)
         }
@@ -66,8 +75,8 @@ public struct Mems<T> {
     ///
     /// - Parameter alignment: 决定了多少个字节为一组
     public static func memStr(ofVal v: inout T, alignment: MemAlign? = nil) -> String {
-        return _memStr(ptr(ofVal: &v),
-                       MemoryLayout.stride(ofValue: v),
+        let p = ptr(ofVal: &v)
+        return _memStr(p, MemoryLayout.stride(ofValue: v),
                        alignment != nil ? alignment!.rawValue : MemoryLayout.alignment(ofValue: v))
     }
     
@@ -82,7 +91,7 @@ public struct Mems<T> {
     
     /// 获得变量的内存地址
     public static func ptr(ofVal v: inout T) -> UnsafeRawPointer {
-        return withUnsafePointer(to: &v) {
+        return MemoryLayout.size(ofValue: v) == 0 ? _EMPTY_PTR : withUnsafePointer(to: &v) {
             UnsafeRawPointer($0)
         }
     }
@@ -92,14 +101,16 @@ public struct Mems<T> {
         if v is Array<Any> {
             var arr = v
             return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).assumingMemoryBound(to: UInt.self).pointee)!
-        } else {
+        } else if type(of: v) is AnyClass {
             return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
+        } else {
+            return _EMPTY_PTR
         }
     }
     
     /// 获得变量所占用的内存大小
     public static func size(ofVal v: inout T) -> Int {
-        return MemoryLayout.stride(ofValue: v)
+        return MemoryLayout.size(ofValue: v) > 0 ? MemoryLayout.stride(ofValue: v) : 0
     }
     
     /// 获得引用所指向内存的大小
