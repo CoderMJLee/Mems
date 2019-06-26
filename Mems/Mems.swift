@@ -101,7 +101,7 @@ public struct Mems<T> {
         if v is Array<Any> {
             var arr = v
             return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).assumingMemoryBound(to: UInt.self).pointee)!
-        } else if type(of: v) is AnyClass {
+        } else if type(of: v) is AnyClass || v is AnyClass {
             return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
         } else {
             return _EMPTY_PTR
