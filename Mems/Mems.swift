@@ -48,8 +48,8 @@ public struct Mems<T> {
         return string
     }
     
-    public static func _memBytes(_ ptr: UnsafeRawPointer,
-                                 _ size: Int) -> [UInt8] {
+    private static func _memBytes(_ ptr: UnsafeRawPointer,
+                                  _ size: Int) -> [UInt8] {
         var arr: [UInt8] = []
         if ptr == _EMPTY_PTR {
             return arr
@@ -101,6 +101,13 @@ public struct Mems<T> {
         if v is Array<Any> {
             var arr = v
             return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).assumingMemoryBound(to: UInt.self).pointee)!
+        } else if v is String {
+            var str = v
+            var mstr = str as! String
+            if mstr.memType() != StringMemType.heap {
+                return _EMPTY_PTR
+            }
+            return UnsafeRawPointer(bitPattern: ptr(ofVal: &str).advanced(by: 8).assumingMemoryBound(to: UInt.self).pointee)!
         } else if type(of: v) is AnyClass || v is AnyClass {
             return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
         } else {
@@ -116,5 +123,21 @@ public struct Mems<T> {
     /// 获得引用所指向内存的大小
     public static func size(ofRef v: T) -> Int {
         return malloc_size(ptr(ofRef: v))
+    }
+}
+
+public enum StringMemType : UInt8 {
+    case text = 0xd0 // 静态数据
+    case taggerPtr = 0xe0 // taggerPointer
+    case heap = 0xf0 // 堆空间
+}
+
+extension String {
+    mutating func memType() -> StringMemType {
+        let bytes = Mems.memBytes(ofVal: &self)
+        if (bytes.last! & 0xf0) == StringMemType.taggerPtr.rawValue {
+            return .taggerPtr
+        }
+        return (bytes[7] & 0xf0) == StringMemType.text.rawValue ? .text : .heap
     }
 }
