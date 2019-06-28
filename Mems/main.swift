@@ -91,6 +91,27 @@ func showArray() {
     show(ref: arr)
 }
 
+/// 字符串
+func showString() {
+    var str1 = "123456789"
+    // taggerPtr（tagger pointer）
+    print(str1.memType())
+    show(val: &str1)
+
+    var str2 = "1234567812345678"
+    // text（字符串存储在TEXT段）
+    print(str2.memType())
+    show(val: &str2)
+
+    var str3 = "1234567812345678"
+    str3.append("9")
+    // heap（字符串存储在堆空间）
+    print(str3.memType())
+    show(val: &str3)
+    show(ref: str3)
+}
+
+/// 字节格式
 func showByteFormat() {
     var int64: Int64 = 10
     print("1个字节为1组 :", Mems.memStr(ofVal: &int64, alignment: .one))
@@ -104,4 +125,5 @@ showEnum()
 showStruct()
 showClass()
 showArray()
+showString()
 showByteFormat()
