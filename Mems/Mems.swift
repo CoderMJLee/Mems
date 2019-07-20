@@ -19,9 +19,7 @@ public struct Mems<T> {
     private static func _memStr(_ ptr: UnsafeRawPointer,
                                 _ size: Int,
                                 _ aligment: Int) ->String {
-        if ptr == _EMPTY_PTR {
-            return ""
-        }
+        if ptr == _EMPTY_PTR { return "" }
         
         var rawPtr = ptr
         var string = ""
@@ -51,9 +49,7 @@ public struct Mems<T> {
     private static func _memBytes(_ ptr: UnsafeRawPointer,
                                   _ size: Int) -> [UInt8] {
         var arr: [UInt8] = []
-        if ptr == _EMPTY_PTR {
-            return arr
-        }
+        if ptr == _EMPTY_PTR { return arr }
         for i in 0..<size {
             arr.append(ptr.advanced(by: i).assumingMemoryBound(to: UInt8.self).pointee)
         }
@@ -102,11 +98,11 @@ public struct Mems<T> {
             var arr = v
             return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).assumingMemoryBound(to: UInt.self).pointee)!
         } else if v is String {
-            var str = v
-            var mstr = str as! String
+            var mstr = v as! String
             if mstr.memType() != StringMemType.heap {
                 return _EMPTY_PTR
             }
+            var str = v
             return UnsafeRawPointer(bitPattern: ptr(ofVal: &str).advanced(by: 8).assumingMemoryBound(to: UInt.self).pointee)!
         } else if type(of: v) is AnyClass || v is AnyClass {
             return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
@@ -130,14 +126,14 @@ public enum StringMemType : UInt8 {
     case text = 0xd0 // 静态数据
     case taggerPtr = 0xe0 // taggerPointer
     case heap = 0xf0 // 堆空间
+    case unknow = 0xff // 未知
 }
 
 extension String {
     mutating func memType() -> StringMemType {
         let bytes = Mems.memBytes(ofVal: &self)
-        if (bytes.last! & 0xf0) == StringMemType.taggerPtr.rawValue {
-            return .taggerPtr
-        }
-        return (bytes[7] & 0xf0) == StringMemType.text.rawValue ? .text : .heap
+        return StringMemType(rawValue: bytes.last! & 0xf0)
+            ?? StringMemType(rawValue: bytes[7] & 0xf0)
+            ?? StringMemType.unknow
     }
 }
