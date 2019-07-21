@@ -94,12 +94,12 @@ func showArray() {
 /// 字符串
 func showString() {
     var str1 = "123456789"
-    // taggerPtr（tagger pointer）
+    // tagPtr（tagger pointer）
     print(str1.memType())
     show(val: &str1)
 
     var str2 = "1234567812345678"
-    // text（字符串存储在TEXT段）
+    // text（TEXT段，常量区）
     print(str2.memType())
     show(val: &str2)
 

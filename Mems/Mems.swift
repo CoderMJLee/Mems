@@ -123,10 +123,14 @@ public struct Mems<T> {
 }
 
 public enum StringMemType : UInt8 {
-    case text = 0xd0 // 静态数据
-    case taggerPtr = 0xe0 // taggerPointer
-    case heap = 0xf0 // 堆空间
-    case unknow = 0xff // 未知
+    /// TEXT段（常量区）
+    case text = 0xd0
+    /// taggerPointer
+    case tagPtr = 0xe0
+    /// 堆空间
+    case heap = 0xf0
+    /// 未知
+    case unknow = 0xff
 }
 
 extension String {
