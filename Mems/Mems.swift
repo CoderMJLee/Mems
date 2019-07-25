@@ -33,13 +33,13 @@ public struct Mems<T> {
             let value: CVarArg
             switch aligment {
             case MemAlign.eight.rawValue:
-                value = rawPtr.assumingMemoryBound(to: UInt64.self).pointee
+                value = rawPtr.load(as: UInt64.self)
             case MemAlign.four.rawValue:
-                value = rawPtr.assumingMemoryBound(to: UInt32.self).pointee
+                value = rawPtr.load(as: UInt32.self)
             case MemAlign.two.rawValue:
-                value = rawPtr.assumingMemoryBound(to: UInt16.self).pointee
+                value = rawPtr.load(as: UInt16.self)
             default:
-                value = rawPtr.assumingMemoryBound(to: UInt8.self).pointee
+                value = rawPtr.load(as: UInt8.self)
             }
             string.append(String(format: fmt, value))
         }
@@ -51,7 +51,7 @@ public struct Mems<T> {
         var arr: [UInt8] = []
         if ptr == _EMPTY_PTR { return arr }
         for i in 0..<size {
-            arr.append(ptr.advanced(by: i).assumingMemoryBound(to: UInt8.self).pointee)
+            arr.append(ptr.load(fromByteOffset: i, as: UInt8.self))
         }
         return arr
     }
@@ -96,14 +96,14 @@ public struct Mems<T> {
     public static func ptr(ofRef v: T) -> UnsafeRawPointer {
         if v is Array<Any> {
             var arr = v
-            return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).assumingMemoryBound(to: UInt.self).pointee)!
+            return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).load(as: Int.self))!
         } else if v is String {
             var mstr = v as! String
-            if mstr.memType() != StringMemType.heap {
+            if mstr.memType() != .heap {
                 return _EMPTY_PTR
             }
             var str = v
-            return UnsafeRawPointer(bitPattern: ptr(ofVal: &str).advanced(by: 8).assumingMemoryBound(to: UInt.self).pointee)!
+            return UnsafeRawPointer(bitPattern: ptr(ofVal: &str).load(fromByteOffset: 8, as: Int.self))!
         } else if type(of: v) is AnyClass || v is AnyClass {
             return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
         } else {
@@ -135,9 +135,9 @@ public enum StringMemType : UInt8 {
 
 extension String {
     mutating func memType() -> StringMemType {
-        let bytes = Mems.memBytes(ofVal: &self)
-        return StringMemType(rawValue: bytes.last! & 0xf0)
-            ?? StringMemType(rawValue: bytes[7] & 0xf0)
-            ?? StringMemType.unknow
+        let ptr = Mems.ptr(ofVal: &self)
+        return StringMemType(rawValue: ptr.load(fromByteOffset: 15, as: UInt8.self) & 0xf0)
+            ?? StringMemType(rawValue: ptr.load(fromByteOffset: 7, as: UInt8.self) & 0xf0)
+            ?? .unknow
     }
 }
