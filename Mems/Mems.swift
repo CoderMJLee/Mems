@@ -28,7 +28,7 @@ public struct Mems<T> {
         for i in 0..<count {
             if i > 0 {
                 string.append(" ")
-                rawPtr = rawPtr.advanced(by: aligment)
+                rawPtr += aligment
             }
             let value: CVarArg
             switch aligment {
@@ -51,7 +51,7 @@ public struct Mems<T> {
         var arr: [UInt8] = []
         if ptr == _EMPTY_PTR { return arr }
         for i in 0..<size {
-            arr.append(ptr.load(fromByteOffset: i, as: UInt8.self))
+            arr.append((ptr + i).load(as: UInt8.self))
         }
         return arr
     }
@@ -94,18 +94,16 @@ public struct Mems<T> {
     
     /// 获得引用所指向内存的地址
     public static func ptr(ofRef v: T) -> UnsafeRawPointer {
-        if v is Array<Any> {
-            var arr = v
-            return UnsafeRawPointer(bitPattern: ptr(ofVal: &arr).load(as: Int.self))!
+        if v is Array<Any>
+            || type(of: v) is AnyClass
+            || v is AnyClass {
+            return UnsafeRawPointer(bitPattern: unsafeBitCast(v, to: UInt.self))!
         } else if v is String {
             var mstr = v as! String
             if mstr.memType() != .heap {
                 return _EMPTY_PTR
             }
-            var str = v
-            return UnsafeRawPointer(bitPattern: ptr(ofVal: &str).load(fromByteOffset: 8, as: Int.self))!
-        } else if type(of: v) is AnyClass || v is AnyClass {
-            return UnsafeRawPointer(Unmanaged.passUnretained(v as AnyObject).toOpaque())
+            return UnsafeRawPointer(bitPattern: unsafeBitCast(v, to: (UInt, UInt).self).1)!
         } else {
             return _EMPTY_PTR
         }
@@ -134,10 +132,10 @@ public enum StringMemType : UInt8 {
 }
 
 extension String {
-    mutating func memType() -> StringMemType {
+    mutating public func memType() -> StringMemType {
         let ptr = Mems.ptr(ofVal: &self)
-        return StringMemType(rawValue: ptr.load(fromByteOffset: 15, as: UInt8.self) & 0xf0)
-            ?? StringMemType(rawValue: ptr.load(fromByteOffset: 7, as: UInt8.self) & 0xf0)
+        return StringMemType(rawValue: (ptr + 15).load(as: UInt8.self) & 0xf0)
+            ?? StringMemType(rawValue: (ptr + 7).load(as: UInt8.self) & 0xf0)
             ?? .unknow
     }
 }
