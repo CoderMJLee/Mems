@@ -100,7 +100,7 @@ public struct Mems<T> {
             return UnsafeRawPointer(bitPattern: unsafeBitCast(v, to: UInt.self))!
         } else if v is String {
             var mstr = v as! String
-            if mstr.memType() != .heap {
+            if mstr.mems.type() != .heap {
                 return _EMPTY_PTR
             }
             return UnsafeRawPointer(bitPattern: unsafeBitCast(v, to: (UInt, UInt).self).1)!
@@ -131,9 +131,29 @@ public enum StringMemType : UInt8 {
     case unknow = 0xff
 }
 
-extension String {
-    mutating public func memType() -> StringMemType {
-        let ptr = Mems.ptr(ofVal: &self)
+public struct MemsWrapper<Base> {
+    public private(set) var base: Base
+    public init(_ base: Base) {
+        self.base = base
+    }
+}
+
+public protocol MemsCompatible {}
+public extension MemsCompatible {
+    static var mems: MemsWrapper<Self>.Type {
+        get { MemsWrapper<Self>.self }
+        set {}
+    }
+    var mems: MemsWrapper<Self> {
+        get { MemsWrapper(self) }
+        set {}
+    }
+}
+
+extension String: MemsCompatible {}
+public extension MemsWrapper where Base == String {
+    mutating func type() -> StringMemType {
+        let ptr = Mems.ptr(ofVal: &base)
         return StringMemType(rawValue: (ptr + 15).load(as: UInt8.self) & 0xf0)
             ?? StringMemType(rawValue: (ptr + 7).load(as: UInt8.self) & 0xf0)
             ?? .unknow

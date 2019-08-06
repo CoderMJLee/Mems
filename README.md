@@ -167,7 +167,7 @@ show(ref: arr)
 ```swift
 var str1 = "123456789"
 // taggerPtr（tagger pointer）
-print(str1.memType())
+print(str1.mems.type())
 show(val: &str1)
 // -------------- String --------------
 // 变量的地址: 0x00007ffeefbff580
@@ -176,7 +176,7 @@ show(val: &str1)
 
 var str2 = "1234567812345678"
 // text（字符串存储在TEXT段）
-print(str2.memType())
+print(str2.mems.type())
 show(val: &str2)
 // -------------- String --------------
 // 变量的地址: 0x00007ffeefbff570
@@ -186,7 +186,7 @@ show(val: &str2)
 var str3 = "1234567812345678"
 str3.append("9")
 // heap（字符串存储在堆空间）
-print(str3.memType())
+print(str3.mems.type())
 show(val: &str3)
 // -------------- String --------------
 // 变量的地址: 0x00007ffeefbff560

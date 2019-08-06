@@ -95,18 +95,18 @@ func showArray() {
 func showString() {
     var str1 = "123456789"
     // tagPtr（tagger pointer）
-    print(str1.memType())
+    print(str1.mems.type())
     show(val: &str1)
 
     var str2 = "1234567812345678"
     // text（TEXT段，常量区）
-    print(str2.memType())
+    print(str2.mems.type())
     show(val: &str2)
 
     var str3 = "1234567812345678"
     str3.append("9")
     // heap（字符串存储在堆空间）
-    print(str3.memType())
+    print(str3.mems.type())
     show(val: &str3)
     show(ref: str3)
 }
