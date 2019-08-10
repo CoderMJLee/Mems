@@ -95,7 +95,7 @@ public struct Mems<T> {
     /// 获得引用所指向内存的地址
     public static func ptr(ofRef v: T) -> UnsafeRawPointer {
         if v is Array<Any>
-            || type(of: v) is AnyClass
+            || Swift.type(of: v) is AnyClass
             || v is AnyClass {
             return UnsafeRawPointer(bitPattern: unsafeBitCast(v, to: UInt.self))!
         } else if v is String {
