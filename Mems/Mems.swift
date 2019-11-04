@@ -141,11 +141,11 @@ public struct MemsWrapper<Base> {
 public protocol MemsCompatible {}
 public extension MemsCompatible {
     static var mems: MemsWrapper<Self>.Type {
-        get { MemsWrapper<Self>.self }
+        get { return MemsWrapper<Self>.self }
         set {}
     }
     var mems: MemsWrapper<Self> {
-        get { MemsWrapper(self) }
+        get { return MemsWrapper(self) }
         set {}
     }
 }
